@@ -116,7 +116,7 @@ pub fn start_repl(settings: settings::Settings) {
             "help" | "h" => {
                 println!(
                     "
-                    bw - CLI for taking notes while reading books\n\
+                    lont - Literarry Organisor for Note Taking\n\
                     General commands:\n\
                     h [help]: show this list\n\
                     q [quit/exit]: quit current session\n\
