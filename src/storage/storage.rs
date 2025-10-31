@@ -17,56 +17,33 @@ pub struct Book {
     pub notes: Vec<Note>,
 }
 
-pub fn get_books() -> Vec<Book> {
+pub fn get_books() -> Result<Vec<Book>, String> {
     use serde_json;
     use std::fs;
     let library_path = get_library_path();
     if !library_path.exists() {
         println!(
             "You have no library. I will make one for you in {}. Add a new book with `new`",
-            library_path.clone().into_os_string().into_string().unwrap()
+            format!("{:?}", library_path.clone().into_os_string().into_string())
         );
         let mut file = OpenOptions::new()
             .write(true)
             .create(true)
             .open(&library_path)
             .expect("Couldn't open file");
-        let _ = file.write_all(b"[]");
+        match file.write_all(b"[]") {
+            Ok(_) => (),
+            Err(e) => {
+                print!("{}", e);
+                return Err("Couldn't write to file".to_string());
+            }
+        }
     }
     let data = fs::read_to_string(&library_path).expect("Error while reading library.json file");
     //let data = fs::read_to_string("src/test.json").expect("Couldn't read test.json file.");
-    let books: Vec<Book> = serde_json::from_str(&data).expect("Couldn't parse JSON.");
-    books
+    let books: Vec<Book> = serde_json::from_str(&data).expect("Couldn't parse library.json file");
+    Ok(books)
 }
-/*/* */
-pub fn new_book(name: String, author: String) -> std::io::Result<()> {
-    use std::fs;
-    use std::io::Write;
-
-    let library_path = get_library_path();
-    let backup_path = library_path.with_extension("bak");
-    fs::copy(&library_path, backup_path)?;
-
-    let mut file = OpenOptions::new()
-        .write(true)
-        .read(true)
-        .create(true)
-        .open(&library_path)?;
-
-    let mut books = get_books();
-    books.push(Book {
-        name: name,
-        author: author,
-        page: 0,
-        notes: Vec::new(),
-    });
-
-    let json_string = serde_json::to_string_pretty(&books)?;
-
-    file.write_all(json_string.as_bytes())?;
-
-    Ok(())
-}*/
 
 pub fn get_library_path() -> std::path::PathBuf {
     use directories_next::ProjectDirs;

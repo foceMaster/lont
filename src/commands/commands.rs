@@ -6,9 +6,17 @@ pub fn get_note_from_page(
     book_index: u16,
     page: u16,
     settings: &crate::settings::Settings,
-) -> String {
-    let books = crate::storage::get_books();
-    let book = &books[book_index as usize];
+) -> Result<String, String> {
+    let books = match crate::storage::get_books() {
+        Ok(n) => n,
+        Err(e) => return Err(e),
+    };
+    let book = match books.get(book_index as usize) {
+        Some(n) => n,
+        None => {
+            return Err("Book index out of range".to_string());
+        }
+    };
     for note in &book.notes {
         if note.start <= page && page <= note.end {
             let mut to_return = String::new();
@@ -21,18 +29,22 @@ pub fn get_note_from_page(
             to_return.push_str(&settings.page_ref_suffix);
             to_return.push_str("\n");
             to_return.push_str(&note.note);
-            return to_return; // p.7-p.31\nThe first part is about...
+            to_return.push_str("\n");
+            return Ok(to_return); // p.7-p.31\nThe first part is about...
         }
     }
-    String::from("No note for this page =(")
+    Err(String::from("No note for this page =("))
 }
 
-pub fn list_books(finished: bool, settings: &crate::settings::Settings) -> String {
-    let books = crate::storage::get_books();
+pub fn list_books(list_finished_too: bool, settings: &crate::settings::Settings) -> String {
+    let books = match crate::storage::get_books() {
+        Ok(n) => n,
+        Err(e) => return e, // No, it didn't fail. It just printed fail info for no reason
+    };
     let mut message = String::from("");
     let mut i = 0;
     for book in books {
-        if book.page != 65535 || finished {
+        if book.page != 65535 || list_finished_too {
             //Only include books that aren't finished unless finished is true
             if i != 0 {
                 //Don't print newline first time
@@ -58,8 +70,20 @@ pub fn delete_book(book_index: u16) -> std::io::Result<()> {
     let backup_path = library_path.with_extension("bak");
     fs::copy(&library_path, backup_path)?;
 
-    let mut books = get_books();
-    books.remove(book_index as usize);
+    let mut books = match get_books() {
+        Ok(n) => n,
+        Err(e) => {
+            return Err(std::io::Error::new(std::io::ErrorKind::Other, e));
+        }
+    };
+    if book_index < books.len() as u16 {
+        books.remove(book_index as usize);
+    } else {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "Book index out of range",
+        ));
+    }
 
     let json_string = serde_json::to_string_pretty(&books)?;
 
@@ -90,7 +114,12 @@ pub fn new_book(name: String, author: String) -> std::io::Result<()> {
         .create(true)
         .open(&library_path)?;
 
-    let mut books = storage::get_books();
+    let mut books = match storage::get_books() {
+        Ok(n) => n,
+        Err(e) => {
+            return Err(std::io::Error::new(std::io::ErrorKind::Other, e));
+        }
+    };
     books.push(storage::Book {
         name: name,
         author: author,
@@ -108,7 +137,29 @@ pub fn new_book(name: String, author: String) -> std::io::Result<()> {
 pub fn note(book_index: u16, page: u16, note: String) -> Result<(), String> {
     use crate::storage::Note;
     use std::io::Write;
-    let mut books = get_books();
+    let mut books = match get_books() {
+        Ok(n) => n,
+        Err(e) => {
+            return Err(e);
+        }
+    };
+    /*
+    if book_index < books.len() as u16 {
+        let book = &mut books[book_index as usize];
+    } else {
+        return Err("Book index out of range".to_string());
+    }
+    */
+    /*
+    let book = if book_index < books.len() as u16 {
+        &mut books[book_index as usize];
+    } else {
+        return Err("Book index out of range".to_string());
+    };
+    */
+    if book_index >= books.len() as u16 {
+        return Err("Book index out of range".to_string());
+    }
     let book = &mut books[book_index as usize];
 
     let notes = &mut book.notes;
@@ -144,7 +195,10 @@ pub fn all_notes(
     step: u16,
     settings: &crate::settings::Settings,
 ) -> String {
-    let books = get_books();
+    let books = match get_books() {
+        Ok(n) => n,
+        Err(e) => return e, //Again, silently fail and print fail info
+    };
     let book = &books[book_index as usize];
 
     let mut current_note: u16 = start_note;

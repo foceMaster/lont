@@ -1,3 +1,15 @@
+macro_rules! graceful {
+    ($expr:expr) => {
+        match $expr {
+            Ok(n) => n,
+            Err(e) => {
+                print!("{}\n", e);
+                continue;
+            }
+        }
+    };
+}
+
 use crate::settings;
 pub fn start_repl(settings: settings::Settings) {
     println!("bw version 0.0.0");
@@ -28,13 +40,12 @@ pub fn start_repl(settings: settings::Settings) {
                 break;
             }
             "readpage" | "rdp" => {
-                let book_index =
-                    ask_for_number("Book index", &settings).expect("Couldn't read book index");
-                let page = ask_for_number("Page", &settings).expect("Couldn't get page");
-                println!(
-                    "{}",
-                    crate::commands::get_note_from_page(book_index, page, &settings)
-                )
+                let book_index = graceful!(ask_for_number("Book index", &settings));
+                let page = graceful!(ask_for_number("Page", &settings));
+                let to_print = graceful!(crate::commands::get_note_from_page(
+                    book_index, page, &settings
+                ));
+                print!("{to_print}");
             }
             "ls" | "list" => {
                 print!("{}", crate::commands::list_books(false, &settings))
@@ -48,61 +59,56 @@ pub fn start_repl(settings: settings::Settings) {
             "touch" | "new" => {
                 let name = ask_for_string("Title", &settings);
                 let author = ask_for_string("Author", &settings);
-                crate::commands::new_book(name.to_string(), author.to_string())
-                    .expect("Couldn't add book to library");
+                graceful!(crate::commands::new_book(
+                    name.to_string(),
+                    author.to_string()
+                ))
             }
             "delete" | "rm" | "del" => {
-                let index =
-                    ask_for_number("Book index", &settings).expect("Couldn't get book index.");
-                crate::commands::delete_book(index).expect("Couldn't delete book.");
+                let index = graceful!(ask_for_number("Book index", &settings));
+                //crate::commands::delete_book(index).expect("Couldn't delete book.");
+                graceful!(crate::commands::delete_book(index));
             }
             "note" | "nt" => {
-                let book_index =
-                    ask_for_number("Book index", &settings).expect("Couldn't get book index");
-                let page = ask_for_number("Page", &settings).expect("Couldn't get page number");
+                let book_index = graceful!(ask_for_number("Book index", &settings));
+                let page = graceful!(ask_for_number("Page", &settings));
                 let note = ask_for_string("My note", &settings);
-                crate::commands::note(book_index, page, note).expect("Couldn't write note");
+                graceful!(crate::commands::note(book_index, page, note));
             }
             "readall" | "rda" => {
-                let book_index =
-                    ask_for_number("Book index", &settings).expect("Couldn't get book index");
+                let book_index = graceful!(ask_for_number("Book index", &settings));
                 print!(
                     "{}",
                     crate::commands::all_notes(book_index, 0, 1, &settings)
                 );
             }
             "readeven" | "rde" => {
-                let book_index =
-                    ask_for_number("Book index", &settings).expect("Couldn't get book index");
+                let book_index = graceful!(ask_for_number("Book index", &settings));
                 print!(
                     "{}",
                     crate::commands::all_notes(book_index, 0, 2, &settings)
                 );
             }
             "readodd" | "rdo" => {
-                let book_index =
-                    ask_for_number("Book index", &settings).expect("Couldn't get book index");
+                let book_index = graceful!(ask_for_number("Book index", &settings));
                 print!(
                     "{}",
                     crate::commands::all_notes(book_index, 1, 2, &settings)
                 );
             }
             "readfor" | "rdf" => {
-                let book_index =
-                    ask_for_number("Book index", &settings).expect("Couldn't get book index");
-                let start_note = ask_for_number("Index of first note", &settings)
-                    .expect("Couldn't get index of first note");
-                let step = ask_for_number("Step size", &settings).expect("Couldn't get step size");
+                let book_index = graceful!(ask_for_number("Book index", &settings));
+                let start_note = graceful!(ask_for_number("Index of first note", &settings));
+                let step = graceful!(ask_for_number("Step size", &settings));
                 print!(
                     "{}",
                     crate::commands::all_notes(book_index, start_note, step, &settings)
                 )
             }
             "finish" | "fsh" => {
-                let book_index =
-                    ask_for_number("Book index", &settings).expect("Couldn't get book index");
+                let book_index = graceful!(ask_for_number("Book index", &settings));
                 let note = ask_for_string("My final thoughts on the book", &settings);
-                crate::commands::note(book_index, 65534, note).expect("Couldn't write note");
+                graceful!(crate::commands::note(book_index, 65534, note));
             }
             "clear" | "clean" | "c" => {
                 print!("\x1Bc\x1B[3J");
