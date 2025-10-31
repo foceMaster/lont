@@ -120,6 +120,7 @@ pub fn start_repl(settings: settings::Settings) {
                     General commands:\n\
                     h [help]: show this list\n\
                     q [quit/exit]: quit current session\n\
+                    c [clear/clean]: clear screen\n\
                     Book management:\n\
                     ls [list]: list currently read books\n\
                     la [listall]: list all books in library\n\

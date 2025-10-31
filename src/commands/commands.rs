@@ -143,20 +143,8 @@ pub fn note(book_index: u16, page: u16, note: String) -> Result<(), String> {
             return Err(e);
         }
     };
-    /*
-    if book_index < books.len() as u16 {
-        let book = &mut books[book_index as usize];
-    } else {
-        return Err("Book index out of range".to_string());
-    }
-    */
-    /*
-    let book = if book_index < books.len() as u16 {
-        &mut books[book_index as usize];
-    } else {
-        return Err("Book index out of range".to_string());
-    };
-    */
+
+    //Return error before declaring variable
     if book_index >= books.len() as u16 {
         return Err("Book index out of range".to_string());
     }
