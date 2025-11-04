@@ -12,7 +12,7 @@ macro_rules! graceful {
 
 use crate::settings;
 pub fn start_repl(settings: settings::Settings) {
-    println!("lont version 0.0.0");
+    println!("lont version 0.1.0");
     //println!(":> WELCOME");
     crate::utils::init_animation(
         settings.prompt.clone(),
