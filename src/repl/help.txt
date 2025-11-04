@@ -1,0 +1,18 @@
+lont - Literary Organiser for Note Taking
+General commands:
+h [help]: show this list
+q [quit/exit]: quit current session
+c [clear/clean]: clear screen
+Book management:
+ls [list]: list currently read books
+la [listall]: list all books in library
+new [touch]: add a new book
+del [delete/rm]: delete a book from library
+fsh [finish]: finish a book and give your final thoughts on it
+Note management:
+nt [note]: make a new note
+rdp [readpage]: read your note about a specific page in a book
+rda [readall]: read all notes about a book
+rde [readeven]: read every second note in a book
+rdo [readodd]: read every second note in a book, skipping the first one
+rdf [readfor]: read notes in a for-fashion, any start note and step size

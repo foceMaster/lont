@@ -114,28 +114,7 @@ pub fn start_repl(settings: settings::Settings) {
                 print!("\x1Bc\x1B[3J");
             }
             "help" | "h" => {
-                println!(
-                    "
-                    lont - Literarry Organisor for Note Taking\n\
-                    General commands:\n\
-                    h [help]: show this list\n\
-                    q [quit/exit]: quit current session\n\
-                    c [clear/clean]: clear screen\n\
-                    Book management:\n\
-                    ls [list]: list currently read books\n\
-                    la [listall]: list all books in library\n\
-                    new [touch]: add a new book\n\
-                    del [delete/rm]: delete a book from library\n\
-                    fsh [finish]: finish a book and give your final thoughts on it\n\
-                    Note management:\n\
-                    nt [note]: make a new note\n\
-                    rdp [readpage]: read your note about a specific page in a book\n\
-                    rda [readall]: read all notes about a book\n\
-                    rde [readeven]: read every second note in a book\n\
-                    rdo [readodd]: read every second note in a book, skipping the first one\n\
-                    rdf [readfor]: read notes in a for-fashion, any start note and step size\
-                    "
-                )
+                println!(include_str!("help.txt"));
             }
             _ => {
                 println!("Invalid input: {input}");
