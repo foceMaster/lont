@@ -18,7 +18,8 @@ pub fn init() -> crate::settings::settings::Settings {
     use directories_next::ProjectDirs;
     use serde_json;
     use std::fs;
-    let proj_dirs = ProjectDirs::from("org", "Calcium", "bw").expect("Failed getting project dirs");
+    let proj_dirs =
+        ProjectDirs::from("org", "Calcium", "lont").expect("Failed getting project dirs");
     let config_dir = proj_dirs.config_dir();
 
     let _ = fs::create_dir(config_dir);

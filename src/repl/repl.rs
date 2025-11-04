@@ -12,7 +12,7 @@ macro_rules! graceful {
 
 use crate::settings;
 pub fn start_repl(settings: settings::Settings) {
-    println!("bw version 0.0.0");
+    println!("lont version 0.0.0");
     //println!(":> WELCOME");
     crate::utils::init_animation(
         settings.prompt.clone(),
@@ -21,7 +21,7 @@ pub fn start_repl(settings: settings::Settings) {
     );
 
     let empty_settings = crate::settings::Settings {
-        //Needed to ask for input
+        //Hack to ask for input
         welcome_message: "".to_string(),
         welcome_delay: 0,
         prompt: "".to_string(),

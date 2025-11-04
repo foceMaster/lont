@@ -49,7 +49,8 @@ pub fn get_library_path() -> std::path::PathBuf {
     use directories_next::ProjectDirs;
     use std::fs;
 
-    let proj_dirs = ProjectDirs::from("org", "Calcium", "bw").expect("Failed getting project dirs");
+    let proj_dirs =
+        ProjectDirs::from("org", "Calcium", "lont").expect("Failed getting project dirs");
     let data_dir = proj_dirs.data_dir();
 
     let _ = fs::create_dir(data_dir);
